@@ -8,7 +8,6 @@
  * @property {object} tooltipOffset How far the tooltip should be from the mouse.
  * @property {number} tooltipOffset.x How far right the tooltip should be from the mouse. Negative values to go left.
  * @property {number} tooltipOffset.y How far down the tooltip should be from the mouse. Negative values to go up.
- * @property {boolean} hideTooltipOnMouseMove Whether tooltips should be hidden when the mouse is moved. True by default.
  * @property {boolean} disableDefaultContextMenus Disable default context menus everywhere, including on items that haven't been given a custom one.
  * @property {number} contextMenuFadeTime How long the fade-in animation for context menus plays (milliseconds).
  * @property {object} contextMenuIcons The icons to be used for default context menu behaviour.
@@ -436,6 +435,7 @@ function contextMenuAlertParent(div, event)
 
 const contextSubLists = {};
 let submenuCount = 0;
+let hasLeftIcon = false;
 
 /**
  * DO NOT USE. Use `makeContextMenu` if you want to use context menus.
@@ -467,6 +467,16 @@ function resolveContextSubLists(container)
             }
             itemCount++;
         }
+        if(hasLeftIcon)
+        {
+            _qsa(".btn:not(.hasLeftIcon)", div).forEach((temp)=>
+            {
+                let blankIcon = makeIcon("error", "material-icons");
+                hideByDefault(blankIcon);
+                temp.prepend(blankIcon);
+            });
+        }
+        hasLeftIcon = false;
         hideByDefault(div);
         if(button !== null)
         {
@@ -551,17 +561,25 @@ function makeContextMenuItem(name, item)
         return null;
     if((item.type == "function") || (item.type == "category"))
     {
-        let icon = "";
+        let leftIcon = "";
+        let rightIcon = "";
         let iconclass = BreveMenus.iconClass;
         let condition = true;
-        if(item.hasOwnProperty('icon'))
-            icon = item.icon;
+        if(item.hasOwnProperty('leftIcon'))
+        {
+            leftIcon = item.leftIcon;
+            hasLeftIcon = true;
+        }
+        if(item.hasOwnProperty('rightIcon'))
+            rightIcon = item.rightIcon;
         if(item.hasOwnProperty('iconlib'))
-            iconclass = item.iconclass;
+            iconclass = item.iconlib;
         if(item.hasOwnProperty('condition'))
             condition = item.condition;
         
-        let button = makeButton(icon, name, iconclass);
+        let button = makeButton(leftIcon, name, iconclass);
+        if(item.hasOwnProperty('leftIcon'))
+            button.classList.add("hasLeftIcon");
         button.classList.add(item.type);
         if(!condition)
         {
@@ -577,7 +595,7 @@ function makeContextMenuItem(name, item)
                 button.addEventListener('click', cancelContextMenu);
             }
             if(item.hasOwnProperty('toggle'))
-                button.append(makeIcon(item.toggle ? BreveMenus.contextMenuIcons.toggleChecked : BreveMenus.contextMenuIcons.toggleUnchecked));
+                rightIcon = (item.toggle ? BreveMenus.contextMenuIcons.toggleChecked : BreveMenus.contextMenuIcons.toggleUnchecked);
         }
         else
         {
@@ -598,8 +616,10 @@ function makeContextMenuItem(name, item)
                 else
                     return null;
             }
-            button.append(makeIcon(BreveMenus.contextMenuIcons.submenu));
+            rightIcon = BreveMenus.contextMenuIcons.submenu;
         }
+        if(rightIcon != "")
+            button.append(makeIcon(rightIcon, iconclass));
         return button;
     }
     else if(item.type == "separator")
@@ -644,6 +664,16 @@ function makeContextMenu(ancestor, menu)
             }
             itemCount++;            
         }
+        if(hasLeftIcon)
+        {
+            _qsa(".btn:not(.hasLeftIcon)", div).forEach((temp)=>
+            {
+                let blankIcon = makeIcon("error", "material-icons");
+                hideByDefault(blankIcon);
+                temp.prepend(blankIcon);
+            });
+        }
+        hasLeftIcon = false;
         if(_qs("#BreveContextMenu") !== null)
             _qs("#BreveContextMenu").remove();
         div.id = "contextMenuMain";

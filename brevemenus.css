@@ -112,6 +112,16 @@
     gap: 5px;
 }
 
+.contextMenu .btn .text
+{
+    flex-grow: 1;
+}
+
+.contextMenu .btn .icon
+{
+    flex-shrink: 0;
+}
+
 .contextMenu .btn .text > span
 {
     color: black;

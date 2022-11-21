@@ -350,9 +350,9 @@ Every function item must contain a callback to a function that will be called wh
 }
 ```
 
-##### Icon
+##### Left Icon
 
-Function items may contain an icon next to the text for decoration or clarity.
+Function items may contain an icon to the left of the text for decoration or clarity.
 The library for these icons will default to whatever you have configured to your `iconClass` in your [config](#config).
 This is OPTIONAL.
 
@@ -363,7 +363,26 @@ This is OPTIONAL.
     {
         console.log("Hello console!");
     },
-    icon: "diamond"
+    leftIcon: "diamond"
+}
+```
+
+##### Right Icon
+
+Function items may contain an icon to the right of the text for decoration or clarity.
+If the item is set to [`toggle`](#toggle), the icon will instead be replaced by the toggle icons defined in your [config](#config-options-1).
+The library for these icons will default to whatever you have configured to your `iconClass` in your [config](#config).
+This is OPTIONAL.
+
+```js
+"This is item text.": {
+    type: "function",
+    run: ()=>
+    {
+        console.log("Hello console!");
+    },
+    leftIcon: "diamond",
+    rightIcon: "favorite"
 }
 ```
 
@@ -379,7 +398,8 @@ This is OPTIONAL.
     {
         console.log("Hello console!");
     },
-    icon: "diamond",
+    leftIcon: "diamond",
+    rightIcon: "favorite",
     iconlib: "material-icons"
 }
 ```
@@ -396,7 +416,8 @@ This is OPTIONAL.
     {
         console.log("Hello console!");
     },
-    icon: "diamond",
+    leftIcon: "diamond",
+    rightIcon: "favorite",
     iconlib: "material-icons",
     condition: true
 }
@@ -414,7 +435,8 @@ This is OPTIONAL.
     {
         console.log("Hello console!");
     },
-    icon: "diamond",
+    leftIcon: "diamond",
+    rightIcon: "favorite",
     iconlib: "material-icons",
     condition: true,
     toggle: false
@@ -446,16 +468,20 @@ This is REQUIRED.
 }
 ```
 
-##### Icon
+##### Left Icon
 
-Category items may contain an icon next to the text for decoration or clarity.
+Category items may contain an icon to the left of the text for decoration or clarity.
 The library for these icons will default to whatever you have configured to your `iconClass` in your [config](#config).
 This is OPTIONAL.
 
 ```js
-"This is category text.": {
-    type: "category",
-    icon: "settings"
+"This is item text.": {
+    type: "function",
+    run: ()=>
+    {
+        console.log("Hello console!");
+    },
+    leftIcon: "settings"
 }
 ```
 
@@ -467,7 +493,7 @@ This is OPTIONAL.
 ```js
 "This is category text.": {
     type: "category",
-    icon: "settings",
+    leftIcon: "settings",
     iconlib: "material-icons"
 }
 ```
@@ -480,7 +506,7 @@ This is OPTIONAL.
 ```js
 "This is category text.": {
     type: "category",
-    icon: "settings",
+    leftIcon: "settings",
     iconlib: "material-icons",
     condition: true
 }
@@ -494,7 +520,7 @@ This is REQUIRED.
 ```js
 "This is category text.": {
     type: "category",
-    icon: "settings",
+    leftIcon: "settings",
     iconlib: "material-icons",
     condition: true,
     children: {
@@ -539,48 +565,52 @@ This is REQUIRED.
 ```
 ```js
 let myElement = document.getElementById("myElement");
-let menu = {
-    "Log to console": {
-        type: "function",
-        run: ()=> {
-            console.log("Logged!");
-        },
-        icon: "terminal",
-        iconlib: "material-icons"
-    },
-    "Hover to view submenu": {
-        type: "category",
-        children: {
-            "I am a child item!": {
-                type: "function",
-                run: myFunction.bind(null, myParameter),
-                toggle: true
+myElement.addEventListener('contextmenu', (event) => {
+    event.preventDefault();
+    let menu = {
+        "Log to console": {
+            type: "function",
+            run: ()=> {
+                console.log("Logged!");
             },
-            "I am also a child item.": {
-                type: "function",
-                run: ()=> {
-                    myFunction(myParameter);
-                },
-                toggle: false
-            }
-        }
-    },
-    "Cool separator": {
-        type: "separator"
-    },
-    "Useless item": {
-        type: "function",
-        run: ()=>
-        {
-            console.log("you can't even click this.");
+            leftIcon: "terminal",
+            iconlib: "material-icons"
         },
-        condition: false
+        "Hover to view submenu": {
+            type: "category",
+            children: {
+                "I am a child item!": {
+                    type: "function",
+                    run: myFunction.bind(null, myParameter),
+                    toggle: true
+                },
+                "I am also a child item.": {
+                    type: "function",
+                    run: ()=> {
+                        myFunction(myParameter);
+                    },
+                    toggle: false
+                }
+            }
+        },
+        "Cool separator": {
+            type: "separator"
+        },
+        "Useless item": {
+            type: "function",
+            rightIcon: "favorite",
+            run: ()=>
+            {
+                console.log("you can't even click this.");
+            },
+            condition: false
+        }
     }
-};
-makeContextMenu(myElement, menu);
+    makeContextMenu(myElement, menu);
+});
 ```
 
-![Context Menu](/images/contekst.png)
+![Context Menu](/images/contextmenu.png)
 
 ### CSS
 
