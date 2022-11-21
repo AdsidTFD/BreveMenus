@@ -8,7 +8,13 @@ Library to make some complex website functions easier.
 
 ## Documentation
 
+### Table of Contents
+* [Timer](#timer)
+* [Tooltips](#tooltips)
+
 ### Timer
+
+The `BreveTimer` class allows you to create objects that function as timeouts with more control, such as pausing and resetting the timer.
 
 #### `new BreveTimer(continueWaiting)`
 
@@ -57,7 +63,7 @@ This stops the timer, which will wait until the [`start()`](#start) function is 
 ##### Parameters:
 None
 
-##### Examples:
+##### Example:
 ```js
 myTimer.wait();
 // myTimer will not count down until it is reset or started.
@@ -70,7 +76,7 @@ This starts the timer if it is currently stopped. It will always start with the 
 ##### Parameters:
 None
 
-##### Examples:
+##### Example:
 ```js
 myTimer.start();
 // myTimer is no longer paused.
@@ -83,8 +89,80 @@ This stops the timer, and resets the values of [`toRun`](#settorun-delay-onwait)
 ##### Parameters:
 None
 
-##### Examples:
+##### Example:
 ```js
 myTimer.cancel();
 // myTimer has been cancelled.
+```
+
+### Tooltips
+
+Tooltips are simplified with Breve Menus, with a single method allowing you to create custom tooltips, which can be modified with CSS.
+
+#### Config Options
+
+* number `tooltipDelay` - The amount of time the user needs to hover over an element to make the tooltip appear in milliseconds. This defaults to 750 milliseconds.
+* number `tooltipFadeTime` - The length of the fade animation for tooltips. This defaults to 0 milliseconds.
+* object `tooltipOffset` - How far the tooltip should appear from the mouse.
+    * number `x` - How far right the tooltip should appear from the mouse in pixels. Negative goes left. This defaults to 5.
+    * number 'y' - How far down the tooltip should appear from the mouse in pixels. Negative goes up. This defaults to 5.
+
+#### `setTooltip(obj, text)`
+
+This sets the tooltip for the given element, and makes it so that the tooltip will appear when hovering over the element for a certain amount of time.
+
+##### Parameters:
+* HTMLElement `obj` - This is the element to which the tooltip should be added.
+* string `text` - This is the text that will display on the tooltip. If left blank, this will default to the `title` attribute of the element passed with the `obj` parameter.
+
+##### Examples:
+```html
+<div id="myElement">
+    <span>My text</span>
+</div>
+<div id="myOtherElement" title="This is my title.">
+    <span>More text!</span>
+</div>
+<div id="myThirdElement" title="This title will be ignored">
+    <span>Even more text!</span>
+</div>
+```
+```js
+let myElement = document.getElementById("myElement");
+setTooltip(myElement, "Custom tooltip");
+// myElement will now display a tooltip that says "Custom tooltip".
+
+let myOtherElement = document.getElementById("myOtherElement");
+setTooltip(myOtherElement);
+// myOtherElement will now display a tooltip that says "This is my title."
+
+let myThirdElement = document.getElementById("myThirdElement");
+setTooltip(myThirdElement, "Replacement tooltip!");
+// myThirdElement will now display a tooltip that says "Replacement tooltip!"
+```
+
+![myElement Tooltip](/images/tooltip1.png)
+![myOtherElement Tooltip](/images/tooltip2.png)
+![myThirdElement Tooltip](/images/tooltip3.png)
+
+#### CSS
+
+These are the CSS rules that you will need to set if you would like to customise your tooltips.
+
+##### Tooltip Container
+
+```css
+#BreveTooltip
+{
+    /* Add your modified rules here. */
+}
+```
+
+##### Tooltip Text
+
+```css
+#BreveTooltip #BreveTooltipText
+{
+    /* Add your modified rules here. */
+}
 ```

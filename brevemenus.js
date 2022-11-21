@@ -2,12 +2,12 @@
 
 /**
  * @typedef config
+ * @property {string} iconClass The library to use for icons.
  * @property {number} tooltipDelay How long the user must hover over an element for a tooltip to appear.
  * @property {number} tooltipFadeTime How long the fade animation for tooltips plays (milliseconds).
  * @property {object} tooltipOffset How far the tooltip should be from the mouse.
  * @property {number} tooltipOffset.x How far right the tooltip should be from the mouse. Negative values to go left.
  * @property {number} tooltipOffset.y How far down the tooltip should be from the mouse. Negative values to go up.
- * @property {string} iconClass The library to use for icons.
  * @property {boolean} disableDefaultContextMenus Disable default context menus everywhere, including on items that haven't been given a custom one.
  */
 /**
@@ -15,11 +15,14 @@
  */
 const BreveMenus =
 {
+    // General
+    iconClass: "material-icons",
+    // Tooltips
     tooltipDelay: 750,
     tooltipFadeTime: 0,
     tooltipOffset: {x: 5, y: 5},
     hideTooltipOnMouseMove: true,
-    iconClass: "material-icons",
+    // Context Menus
     disableDefaultContextMenus: false
 }
 
