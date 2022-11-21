@@ -140,7 +140,9 @@ setTooltip(myThirdElement, "Replacement tooltip!");
 ```
 
 ![myElement Tooltip](/images/tooltip1.png)
+
 ![myOtherElement Tooltip](/images/tooltip2.png)
+
 ![myThirdElement Tooltip](/images/tooltip3.png)
 
 ### CSS
