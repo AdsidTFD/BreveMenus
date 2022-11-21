@@ -8,6 +8,7 @@
  * @property {number} tooltipOffset.x How far right the tooltip should be from the mouse. Negative values to go left.
  * @property {number} tooltipOffset.y How far down the tooltip should be from the mouse. Negative values to go up.
  * @property {string} iconClass The library to use for icons.
+ * @property {boolean} disableDefaultContextMenus Disable default context menus everywhere, including on items that haven't been given a custom one.
  */
 /**
  * @type config
@@ -18,7 +19,8 @@ const BreveMenus =
     tooltipFadeTime: 0,
     tooltipOffset: {x: 5, y: 5},
     hideTooltipOnMouseMove: true,
-    iconClass: "material-icons"
+    iconClass: "material-icons",
+    disableDefaultContextMenus: false
 }
 
 const mouse = {x: 0, y: 0};
@@ -26,6 +28,10 @@ window.addEventListener('mousemove', (event)=>
 {
     mouse.x = event.clientX;
     mouse.y = event.clientY;
+});
+window.addEventListener('contextmenu', (event)=>
+{
+    event.preventDefault();
 });
 
 /**
@@ -78,7 +84,7 @@ class BreveTimer
 {
     /**
      * Creates a new BreveTimer object.
-     * @param {boolean} continueWaiting Whether the current state of the timer is saved. When `true`, the timer will automatically start upon `set()`. Otherwise, `start()` is the only way to start the timer.
+     * @param {boolean} continueWaiting Whether the current state of the timer is saved. When `true`, the timer will automatically start upon `set()`. Otherwise, `start()` is the only way to start the timer. Defaults to false.
      */
     constructor(continueWaiting = false)
     {
@@ -93,7 +99,7 @@ class BreveTimer
     /**
      * Sets the timer.
      * @param {function} toRun Function to run when timer ends.
-     * @param {number} delay Duration of timer (milliseconds).
+     * @param {number} delay Duration of timer (milliseconds). Defaults to 1000.
      * @param {function} onWait Function to run when `wait()` is called.
      */
     set(toRun, delay = this.waitingDelay, onWait = null)
@@ -144,6 +150,7 @@ class BreveTimer
             this.waiting = false;
         this.active = false;
         this.waitingToRun = null;
+        this.waitingDelay = 1000;
     }
 }
 
@@ -298,8 +305,11 @@ function setTooltip(obj, text = "")
         if(BreveMenus.hideTooltipOnMouseMove)
         {
             hide(tooltip);
-            tooltipTimer.wait();
-            tooltipTimer.start();
+            if(!tooltipTimer.waiting)
+            {
+                tooltipTimer.wait();
+                tooltipTimer.start();
+            }
         }
     });
     obj.addEventListener('mouseout', ()=>
@@ -311,6 +321,9 @@ function setTooltip(obj, text = "")
 
 let contextMenuParent = null;
 
+/**
+ * DO NOT USE. Use `makeContextMenu` if you want to use context menus.
+ */
 function cancelContextMenu()
 {
     if(_qs("#BreveContextMenu") !== null)
@@ -325,6 +338,10 @@ function cancelContextMenu()
     }
 }
 
+/**
+ * DO NOT USE. Use `makeContextMenu` if you want to use context menus.
+ * @param {*} event 
+ */
 function leftClickCancelContextMenu(event)
 {
     let mouseInsideMenu = false;
@@ -343,22 +360,40 @@ function leftClickCancelContextMenu(event)
         cancelContextMenu();
 }
 
+/**
+ * DO NOT USE. Use `makeContextMenu` if you want to use context menus.
+ * @param {*} event 
+ */
 function escKeyCancelContextMenu(event)
 {
     if(event.key == "Escape")
         cancelContextMenu();
 }
 
+/**
+ * DO NOT USE. Use `makeContextMenu` if you want to use context menus.
+ * @param {*} button 
+ */
 function selectMenuItem(button)
 {
     button.classList.add("selected");
 }
 
+/**
+ * DO NOT USE. Use `makeContextMenu` if you want to use context menus.
+ * @param {*} button 
+ */
 function deselectMenuItem(button)
 {
     button.classList.remove("selected");
 }
 
+/**
+ * DO NOT USE. Use `makeContextMenu` if you want to use context menus.
+ * @param {*} div 
+ * @param {*} event 
+ * @returns 
+ */
 function contextMenuAlertParent(div, event)
 {
     if(_qsa(".selected", div).length > 0)
@@ -387,6 +422,10 @@ function contextMenuAlertParent(div, event)
 const contextSubLists = {};
 let submenuCount = 0;
 
+/**
+ * DO NOT USE. Use `makeContextMenu` if you want to use context menus.
+ * @param {*} container 
+ */
 function resolveContextSubLists(container)
 {
     let prev = null;
@@ -484,6 +523,12 @@ function resolveContextSubLists(container)
     }
 }
 
+/**
+ * DO NOT USE. Use `makeContextMenu` if you want to use context menus.
+ * @param {*} name 
+ * @param {*} item 
+ * @returns 
+ */
 function makeContextMenuItem(name, item)
 {
     if(!item.hasOwnProperty('type'))
@@ -554,6 +599,11 @@ function makeContextMenuItem(name, item)
         return null;
 }
 
+/**
+ * Creates a context menu for the given element using the given JSON configuration.
+ * @param {HTMLElement} ancestor The element to assign the context menu to.
+ * @param {Object} menu The JSON object containing the menu configuration.
+ */
 function makeContextMenu(ancestor, menu)
 {
     setTimeout(function()
