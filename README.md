@@ -7,8 +7,23 @@ Library to make some complex website functions easier.
 * Context menus vastly simplified - you only need a simple JSON object!
 
 ## Table of Contents
+* [Config](#config)
 * [Timer](#timer)
 * [Tooltips](#tooltips)
+* [Context Menus](#context-menus)
+
+## Config
+
+These are the config options available with Breve Menus. They can be found at the top of the `brevemenus.js` file, where you can either modify them directly, or modify them through your own file with `BreveMenus.<property>` (the latter is recommended).
+
+* string `iconClass` - This is the class/library from which any icons used by Breve Menus will be used by default. The name of the class MUST be defined in your stylesheets beforehand, otherwise, this won't work. Google's "material icons" pack is built into Breve Menus. Additionally, you cannot use any image. You must use an icon font.
+* number [`tooltipDelay`](#tooltips)
+* number [`tooltipFadeTime`](#tooltips)
+* object [`tooltipOffset`](#tooltips)
+* boolean [`hideTooltipOnMouseMove`](#tooltips)
+* boolean [`disableDefaultContextMenus`](#context-menus)
+* number [`contextMenuFadeTime`](#context-menus)
+* object [`contextMenuIcons`](#context-menus)
 
 ## Timer
 
@@ -104,6 +119,7 @@ Tooltips are simplified with Breve Menus, with a single method allowing you to c
 * object `tooltipOffset` - How far the tooltip should appear from the mouse.
     * number `x` - How far right the tooltip should appear from the mouse in pixels. Negative goes left. This defaults to 5.
     * number 'y' - How far down the tooltip should appear from the mouse in pixels. Negative goes up. This defaults to 5.
+* boolean `hideTooltipOnMouseMove` - Whether the tooltips should be hidden when the mouse is moved. This is true by default.
 
 ### `setTooltip(obj, text)`
 
@@ -162,6 +178,405 @@ These are the CSS rules that you will need to set if you would like to customise
 
 ```css
 #BreveTooltip #BreveTooltipText
+{
+    /* Add your modified rules here. */
+}
+```
+
+## Context Menus
+
+Context menus can be really complicated, but with Breve Menus, all you need is an object that contains a simple configuration to pass to a method that will do all of the hard work for you.
+
+### Config Options
+
+* boolean `disableDefaultContextMenus` - Setting this to `true` will disable the default context menus on your website altogether, regardless of whether each element has a custom one set. Elements with a custom context menu will always dsiable the default, regardless of what this value is set to.
+* number `contextMenuFadeTime` - The length of the fade-in animation for context menus. This defaults to 0 milliseconds.
+* object `contextMenuIcons` - The icons to be used for default context menu behaviour.
+    * string `toggleUnchecked` - The icon to display on an unchecked toggle item.
+    * string `toggleChecked` - The icon to display on a checked toggle item.
+    * string `submenu` - The icon to display on a category item.
+
+### `makeContextMenu(ancestor, menu)`
+
+This will create your context menu, as well as do all of the handling necessary for it, including all of the event listeners. The context menus can be closed by left clicking outside the menu, right clicking outside the menu, or hitting the `Escape` key.
+
+#### Parameters:
+
+* HTMLElement `ancestor` - This is the element to which the context menu will be added. That is, right clicking on this element will open its menu.
+* Object [`menu`](#menu-object) - This is the object containing all of the menu configuration.
+
+#### Example:
+
+```html
+<div id="myElement">
+    <span>There is text here.</span>
+</div>
+```
+```js
+let myElement = document.getElementById("myElement");
+makeContextMenu(myElement, myMenu); // See the Menu Object section for information on myMenu.
+// myElement will now open the myMenu context menu when right clicked.
+```
+
+### Menu Object
+
+Context menus can be created by making an object that contains some basic configuration for the menu. This is extremely easy to do.
+
+There are three types of menu items: functions, categories, and separators.
+
+Note: Two items within the same list cannot have the same name. However, if they are in separate lists, such as one in the main list and one in a sublist, there is no problem.
+
+#### Function Items
+
+Function items are items that, when clicked, will run a specific function. They have the following configuration.
+
+##### Name
+
+Declare the name of the function item in a string identifier. This is the text that will be displayed on the item in the context menu.
+
+```js
+"This is item text.": {
+    // Item configuration in here.
+}
+```
+
+##### Type
+
+Every function item will have the type listed as `"function"`.
+This is REQUIRED.
+
+```js
+"This is item text.": {
+    type: "function"
+}
+```
+
+##### Run
+
+Every function item must contain a callback to a function that will be called when it is clicked. This is REQUIRED.
+
+```js
+"This is item text.": {
+    type: "function",
+    run: ()=>
+    {
+        console.log("Hello console!");
+    }
+}
+```
+
+##### Icon
+
+Function items may contain an icon next to the text for decoration or clarity.
+The library for these icons will default to whatever you have configured to your `iconClass` in your [config](#config).
+This is OPTIONAL.
+
+```js
+"This is item text.": {
+    type: "function",
+    run: ()=>
+    {
+        console.log("Hello console!");
+    },
+    icon: "diamond"
+}
+```
+
+##### Icon Library
+
+Function items with an icon may have their icon class set to something specific, if you want it to differ from your `iconClass` in [config](#config).
+This is OPTIONAL.
+
+```js
+"This is item text.": {
+    type: "function",
+    run: ()=>
+    {
+        console.log("Hello console!");
+    },
+    icon: "diamond",
+    iconlib: "material-icons"
+}
+```
+
+##### Condition
+
+Function items can be disabled by setting a boolean value for their condition. By default, the item will be usable, but, if set to `false`, will grey out the item and render it unusable.
+This is OPTIONAL.
+
+```js
+"This is item text.": {
+    type: "function",
+    run: ()=>
+    {
+        console.log("Hello console!");
+    },
+    icon: "diamond",
+    iconlib: "material-icons",
+    condition: true
+}
+```
+
+##### Toggle
+
+Function items can be set to be a checkbox. This is only for display reasons, and the boolean value is only displayed as it is passed. If no value is set, the checkbox will not display.
+This is OPTIONAL.
+
+```js
+"This is item text.": {
+    type: "function",
+    run: ()=>
+    {
+        console.log("Hello console!");
+    },
+    icon: "diamond",
+    iconlib: "material-icons",
+    condition: true,
+    toggle: false
+}
+```
+
+#### Category Items
+
+Category items are menu items that, when clicked on or hovered over, will open a submenu containing children items. This does not have a limit (but don't abuse it, for your users' sake!).
+
+##### Name
+
+Declare the name of the category item in a string identifier. This is the text that will be displayed on the item in the context menu.
+
+```js
+"This is category text.": {
+    // Item configuration in here.
+}
+```
+
+##### Type
+
+Every category item will have the type listed as `"category"`.
+This is REQUIRED.
+
+```js
+"This is category text.": {
+    type: "category"
+}
+```
+
+##### Icon
+
+Category items may contain an icon next to the text for decoration or clarity.
+The library for these icons will default to whatever you have configured to your `iconClass` in your [config](#config).
+This is OPTIONAL.
+
+```js
+"This is category text.": {
+    type: "category",
+    icon: "settings"
+}
+```
+
+##### Icon Library
+
+Category items with an icon may have their icon class set to something specific, if you want it to differ from your `iconClass` in [config](#config).
+This is OPTIONAL.
+
+```js
+"This is category text.": {
+    type: "category",
+    icon: "settings",
+    iconlib: "material-icons"
+}
+```
+
+##### Condition
+
+Category items can be disabled by setting a boolean value for their condition. By default, the item will be usable, but, if set to `false`, will grey out the item and render it unusable.
+This is OPTIONAL.
+
+```js
+"This is category text.": {
+    type: "category",
+    icon: "settings",
+    iconlib: "material-icons",
+    condition: true
+}
+```
+
+##### Children
+
+Category items, if their condition is not set to `false`, must have children to display as part of a submenu. The format of these children is the same as the format of any other item, simply nested inside the children attribute.
+This is REQUIRED.
+
+```js
+"This is category text.": {
+    type: "category",
+    icon: "settings",
+    iconlib: "material-icons",
+    condition: true,
+    children: {
+        "This is sub-item 1": {
+            type: "function",
+            run: myFunction
+        },
+        "This is sub-item 2": {
+            type: "function",
+            run: myFunction,
+            condition: false
+        }
+    }
+}
+```
+
+#### Separator Items
+
+Separator items will simply display a thin line across the context menu, serving to separate multiple sections of said menu.
+
+##### Name
+
+The name of the separator does not matter, but it must not match the name of any other separator in the same menu.
+
+##### Type
+
+Every separator item will have the type listed as `"separator"`.
+This is REQUIRED.
+
+```js
+"This is a separator": {
+    type: "separator"
+}
+```
+
+#### Overall Example
+
+```html
+<div id="myElement">
+    <span>There is text here.</span>
+</div>
+```
+```js
+let myElement = document.getElementById("myElement");
+let menu = {
+    "Log to console": {
+        type: "function",
+        run: ()=> {
+            console.log("Logged!");
+        },
+        icon: "terminal",
+        iconlib: "material-icons"
+    },
+    "Hover to view submenu": {
+        type: "category",
+        children: {
+            "I am a child item!": {
+                type: "function",
+                run: myFunction.bind(null, myParameter),
+                toggle: true
+            },
+            "I am also a child item.": {
+                type: "function",
+                run: ()=> {
+                    myFunction(myParameter);
+                },
+                toggle: false
+            }
+        }
+    },
+    "Cool separator": {
+        type: "separator"
+    },
+    "Useless item": {
+        type: "function",
+        run: ()=>
+        {
+            console.log("you can't even click this.");
+        },
+        condition: false
+    }
+};
+makeContextMenu(myElement, menu);
+```
+
+![Context Menu](/images/contekst.png)
+
+### CSS
+
+These are the CSS rules that you will need to set if you would like to customise your context menus.
+
+#### Context Menu Background
+
+```css
+#BreveContextMenu .contextMenu
+{
+    /* Add your modified rules here. */
+}
+```
+
+#### Context Menu Button Container
+
+```css
+#BreveContextMenu .contextMenu .btn
+{
+    /* Add your modified rules here. */
+}
+```
+
+#### Context Menu Button Hover
+
+```css
+#BreveContextMenu .contextMenu .btn:hover:not(.noFunction)
+{
+    /* Add your modified rules here. */
+}
+```
+
+#### Context Menu Button with Submenu Selected
+
+```css
+#BreveContextMenu .contextMenu .btn.selected
+{
+    /* Add your modified rules here. */
+}
+```
+
+#### Context Menu Button Disabled
+
+```css
+#BreveContextMenu .contextMenu .btn.noFunction
+{
+    /* Add your modified rules here. */
+}
+```
+
+#### Context Menu Button Icon
+
+```css
+#BreveContextMenu .contextMenu .btn .icon > i
+{
+    /* Add your modified rules here. */
+}
+```
+
+#### Context Menu Button Text
+
+```css
+#BreveContextMenu .contextMenu .btn .text > span
+{
+    /* Add your modified rules here. */
+}
+```
+
+#### Context Menu Separator Container
+
+```css
+#BreveContextMenu .contextMenu .separator
+{
+    /* Add your modified rules here. */
+}
+```
+
+#### Context Menu Separator Line
+
+```css
+#BreveContextMenu .contextMenu .separator > div
 {
     /* Add your modified rules here. */
 }

@@ -8,7 +8,13 @@
  * @property {object} tooltipOffset How far the tooltip should be from the mouse.
  * @property {number} tooltipOffset.x How far right the tooltip should be from the mouse. Negative values to go left.
  * @property {number} tooltipOffset.y How far down the tooltip should be from the mouse. Negative values to go up.
+ * @property {boolean} hideTooltipOnMouseMove Whether tooltips should be hidden when the mouse is moved. True by default.
  * @property {boolean} disableDefaultContextMenus Disable default context menus everywhere, including on items that haven't been given a custom one.
+ * @property {number} contextMenuFadeTime How long the fade-in animation for context menus plays (milliseconds).
+ * @property {object} contextMenuIcons The icons to be used for default context menu behaviour.
+ * @property {string} contextMenuIcons.toggleUnchecked The icon to display on an unchecked toggle item.
+ * @property {string} contextMenuIcons.toggleChecked The icon to display on a checked toggle item.
+ * @property {string} contextMenuIcons.submenu The icon to display on a category item.
  */
 /**
  * @type config
@@ -23,7 +29,13 @@ const BreveMenus =
     tooltipOffset: {x: 5, y: 5},
     hideTooltipOnMouseMove: true,
     // Context Menus
-    disableDefaultContextMenus: false
+    disableDefaultContextMenus: false,
+    contextMenuFadeTime: 0,
+    contextMenuIcons: {
+        toggleUnchecked: "check_box_outline_blank",
+        toggleChecked: "check_box",
+        submenu: "chevron_right"
+    }
 }
 
 const mouse = {x: 0, y: 0};
@@ -439,6 +451,7 @@ function resolveContextSubLists(container)
             delete contextSubLists[prev];
         let div = document.createElement('div');
         div.className = "contextMenu";
+        div.style.animationDuration = `${BreveMenus.contextMenuFadeTime}ms`;
         div.id = `contextMenuSub${submenuCount}`;
         let button = null;
         let itemCount = 1;
@@ -564,7 +577,7 @@ function makeContextMenuItem(name, item)
                 button.addEventListener('click', cancelContextMenu);
             }
             if(item.hasOwnProperty('toggle'))
-                button.append(makeIcon(item.toggle ? "check_box" : "check_box_outline_blank"));
+                button.append(makeIcon(item.toggle ? BreveMenus.contextMenuIcons.toggleChecked : BreveMenus.contextMenuIcons.toggleUnchecked));
         }
         else
         {
@@ -585,7 +598,7 @@ function makeContextMenuItem(name, item)
                 else
                     return null;
             }
-            button.append(makeIcon("chevron_right"));
+            button.append(makeIcon(BreveMenus.contextMenuIcons.submenu));
         }
         return button;
     }
@@ -603,9 +616,9 @@ function makeContextMenuItem(name, item)
 }
 
 /**
- * Creates a context menu for the given element using the given JSON configuration.
+ * Creates a context menu for the given element using the given configuration.
  * @param {HTMLElement} ancestor The element to assign the context menu to.
- * @param {Object} menu The JSON object containing the menu configuration.
+ * @param {Object} menu The object containing the menu configuration.
  */
 function makeContextMenu(ancestor, menu)
 {
@@ -613,7 +626,9 @@ function makeContextMenu(ancestor, menu)
     {
         contextMenuParent = ancestor;
         let containerDiv = document.createElement('div');
+        containerDiv.style.animationDuration = `${BreveMenus.contextMenuFadeTime}ms`;
         let div = document.createElement('div');
+        div.style.animationDuration = `${BreveMenus.contextMenuFadeTime}ms`;
         hideByDefault(containerDiv);
         containerDiv.id = "BreveContextMenu";
         containerDiv.className = "contextMenuContainer";
