@@ -661,6 +661,15 @@ These are the CSS rules that you will need to set if you would like to customise
 }
 ```
 
+#### Context Menu Button Disabled Contents
+
+```css
+#BreveContextMenu .contextMenu .btn.noFunction > *
+{
+    /* Add your modified rules here. */
+}
+```
+
 #### Context Menu Button Icon
 
 ```css
