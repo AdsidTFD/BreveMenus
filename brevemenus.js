@@ -45,7 +45,7 @@ window.addEventListener('mousemove', (event)=>
 });
 window.addEventListener('contextmenu', (event)=>
 {
-    if(disableDefaultContextMenus)
+    if(BreveMenus.disableDefaultContextMenus)
         event.preventDefault();
 });
 
